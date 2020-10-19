@@ -16,7 +16,7 @@
 title: Neo Kabuto's Blog
 email: neokabuto@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  
+  Tutorials and more
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: neokabuto
@@ -24,7 +24,7 @@ github_username:  neokabuto
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-tactile
+theme: minima
 plugins:
   - jekyll-feed
 
