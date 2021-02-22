@@ -61,15 +61,15 @@ Now let's see our first visible bit of progress. Go back to Program.cs, and add 
 
 
 ```csharp
-        using (Ga`me game = new Game())
+        using (Game game = new Game())
         {
                 game.Run(30.0);
-        }`
+        }
 ```
 
 If you run this code, you'll see a window pop up:
 
-![]({{ site.url }}/assets/tut1/1.png)
+![]({{ site.url }}/assets/imagestut1/1.png)
 
 It's blank and boring, but it's definitely progress.
 
@@ -143,7 +143,7 @@ We have to do one more thing before we'll see this color change, though. Add ano
 We'll be expanding on this later, but right now you can run it again and see our changes:
 
 
-![]({{ site.url }}/assets/tut1/2.png)
+![]({{ site.url }}/assets/imagestut1/2.png)
 
 
 
@@ -199,7 +199,7 @@ Now we'll want to draw the triangle itself. The first step is to tell OpenGL we 
 The BeginMode class has constants for all the different primitive types we have available:
 
 
-![]({{ site.url }}/assets/tut1/3.gif)
+![]({{ site.url }}/assets/imagestut1/3.gif)
 from [http://www.opentk.com/doc/chapter/2/opengl/geometry/primitives](https://web.archive.org/web/20110411134643/http://www.opentk.com/doc/chapter/2/opengl/geometry/primitives)
 
 
@@ -233,7 +233,7 @@ After the vertices have been sent to the graphics card, we need to tell OpenGL t
 
 If you run this code, you'll see your first triangle:
 
-![]({{ site.url }}/assets/tut1/4.png)
+![]({{ site.url }}/assets/imagestut1/4.png)
 
 Let's go a step further. With the `GL.Color3` function, we can set the color the triangle is drawn with. You call it before sending the position of the vertex, like this:
 
@@ -249,6 +249,6 @@ Let's go a step further. With the `GL.Color3` function, we can set the color the
 ```
 If you run that, you'll see the following:
 
-![]({{ site.url }}/assets/tut1/5.png)
+![]({{ site.url }}/assets/imagestut1/5.png)
 
 Why is it a gradient across the triangle? That's because of the default shaders being used. Shaders allow for many really amazing effects, such as bump-mapping, lighting, phong, etc. The default ones simply interpolate between the values given to them for color and position when they draw the vertices. Shaders are a much more complex feature (even using their own scripting language), so obviously they're possibly content for a future tutorial.
