@@ -11,7 +11,7 @@ I'm writing this tutorial because the actual OpenTK documentation is sorely lack
 
 (As another note, this is technically using a deprecated way to do it, but I'm basing this on their example)
 
-#Part 1: Setup
+# Part 1: Setup
 
 
 
@@ -31,7 +31,7 @@ The next part will actually follow from the <a href="http://www.opentk.com/doc/c
 OpenTK depends on System.Drawing, so you also need to add a reference to System.Drawing.dll. In the "Solution Explorer" pane, rightclick "References" and select to "Add Reference". In the .NET tab, select System.Drawing and click OK.
 
 
-#Part 2: Coding
+# Part 2: Coding
 
 Now we have a basically empty project. What we'll want to do first is to open the Program.cs file. Right now it's a basic class, doing nothing. We'll keep it around for our Main function. To start displaying anything, we need to make a sub-class of the [`GameWindow`](http://www.opentk.com/files/doc/class_open_t_k_1_1_game_window.html) type. Add a new class called "Game". Make it a subclass of GameWindow (you'll need to add a using directive for OpenTK to use the class).
 
