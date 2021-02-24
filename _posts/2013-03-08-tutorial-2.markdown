@@ -16,7 +16,7 @@ We'll be starting out a lot like the previous tutorial, which I'll be referencin
 
 To start, we'll need to make a new project file, with references to OpenTK and System.Drawing, as in the previous tutorial. Name it something like OpenTKTutorial2, for convenience.
 
-# Part 2: COding
+# Part 2: Coding
 
 First we need to do some of the basics from the first tutorial again.  Add a new class called "Game". Make it a subclass of GameWindow (you'll need to add a using directive for OpenTK to use the class).
 
@@ -82,7 +82,7 @@ What we'll need to do first is create our shaders. Shaders are how modern OpenGL
 Add a text file to your project called "vs.glsl". This will store our vertex shader:
 
 
-```csharp
+```glsl
 #version 330
 
 in vec3 vPosition;
@@ -109,7 +109,7 @@ There's also a "uniform" variable here, which is the same for the entire object 
 
 Our fragment shader is significantly simpler. Save the following as "fs.glsl":
 
-```csharp
+```glsl
 #version 330
 
 in vec4 color;
