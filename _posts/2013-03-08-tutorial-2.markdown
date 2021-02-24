@@ -7,39 +7,18 @@ categories: tutorial
 
 The previous tutorial showed us how we can draw a triangle to the screen. However, it came with a disclaimer. Even though it works, it's not the "correct" way to do things anymore. The way we sent our geometry to the GPU was what's known as "immediate mode", which isn't the newest way to do things, even if it is so very nice and simple.
 
-
-
 In this tutorial, we'll be going for the same end goal, but we'll be doing things in a way that is more complex, but at the same time more efficient, faster, and more expandable.
 
 
+We'll be starting out a lot like the previous tutorial, which I'll be referencing a few times, so if you haven't already, [take a look at it](https://neokabuto.github.io/tutorial/2013/02/16/tutorial-1.html).
 
-
-
-<!--more-->
-
-
-
-We'll be starting out a lot like the previous tutorial, which I'll be referencing a few times, so if you haven't already, <a href="http://neokabuto.blogspot.com/2013/02/opentk-tutorial-1-opening-windows-and.html">take a look at it.</a>
-
-
-
-Part 1: Setup
-
-
+# Part 1: Setup
 
 To start, we'll need to make a new project file, with references to OpenTK and System.Drawing, as in the previous tutorial. Name it something like OpenTKTutorial2, for convenience.
 
-
-
-Part 2: Coding
-
-
+# Part 2: COding
 
 First we need to do some of the basics from the first tutorial again.  Add a new class called "Game". Make it a subclass of GameWindow (you'll need to add a using directive for OpenTK to use the class).
-
-
-
-
 
 You should have something like this:
 
@@ -60,12 +39,7 @@ namespace OpenTKTutorial2
 }
 ```
 
-
-
-
 Go back to Program.cs, and add the following code to the Main function:
-
-
 
 ```csharp
 using (Game game = new Game())
@@ -74,14 +48,7 @@ using (Game game = new Game())
 }
 ```
 
-
-
-
 This is the same code to make a window and get it to pop up for us (set to update 30 times a second and display at 30 FPS). Now we'll override onLoad again, so we can change the color and title for our window:
-
-
-
-
 
 ```csharp
 protected override void OnLoad(EventArgs e)
@@ -94,14 +61,7 @@ protected override void OnLoad(EventArgs e)
 }
 ```
 
-
-
-
 Override onRenderFrame, like before, so it'll display our blue background:
-
-
-
-
 
 ```csharp
 protected override void OnRenderFrame(FrameEventArgs e)
@@ -114,9 +74,7 @@ protected override void OnRenderFrame(FrameEventArgs e)
 }
 ```
 
-
 Now we can get to the new stuff!
-
 
 What we'll need to do first is create our shaders. Shaders are how modern OpenGL knows how to draw the values it's been given. We'll be working with two kinds of shaders: a vertex shader and a fragment shader. The vertex shader tells the graphics code information about the points in the shape being drawn. The fragment shader determines what color each pixel of the shape will be when it's drawn to the screen. The code we'll be using is very simple, but it'll let us draw similarly to immediate mode. OpenGL's shaders are programmed in a C-like scripting language called GLSL (However, DirectX uses a slightly different language called HLSL).
 
@@ -141,9 +99,7 @@ main()
 }
 ```
 
-
 (Note: for the shader files, you'll probably need to tell your IDE to copy them to your output directory. Otherwise, the program won't be able to find them!)
-
 
 The first line tells the linker which version of GLSL is being used.
 
@@ -166,155 +122,78 @@ main()
 }
 ```
 
-
-
-
 It just takes the color variable from before (note that it's an "in" insead of an "out" now), and sets the output to be that color.
-
-
-
 
 Now that we have these shaders made, we need to tell the graphics card to use them. First, we'll need to tell OpenGL to make a new program object. This will store our shaders together in a usable form. 
 
-
-
-
 First, define a variable for the program's ID (its address), outside the scope of any of the functions. We don't store the program object itself on our end of the code. We only have an address to refer to it by, as it stays on the graphics card.
-
-
-
 
 ```csharp
 int pgmID;
 ```
 
-
-
-
-
 Make a new function in the Game class, called initProgram. In this function, we'll start with a call to the GL.CreateProgram() function, which returns the ID for a new program object, which we'll store in pgmID.
 
-
-
-
 ```csharp
-void initProgram()
-{
-            pgmID = GL.CreateProgram();
-}
+    void initProgram()
+    {
+        pgmID = GL.CreateProgram();
+    }
 ```
-
-
-
-
 
 Now we're going to take a short detour to make a function that reads our shaders and adds them.
 
-
-
-
 This function needs to take a filename and some information, and return the address for the shader that was created.
-
-
-
 
 It should look something like this:
 
-
-
-
-
-
-
-
 ```csharp
 void loadShader(String filename,ShaderType type, int program, out int address)
-```
-```csharp
 {
-            address = GL.CreateShader(type);
-            using (StreamReader sr = new StreamReader(filename))
-            {
-                GL.ShaderSource(address, sr.ReadToEnd());
-            }
-            GL.CompileShader(address);
-            GL.AttachShader(program, address);
-            Console.WriteLine(GL.GetShaderInfoLog(address));
+    address = GL.CreateShader(type);
+    using (StreamReader sr = new StreamReader(filename))
+    {
+        GL.ShaderSource(address, sr.ReadToEnd());
+    }
+    GL.CompileShader(address);
+    GL.AttachShader(program, address);
+    Console.WriteLine(GL.GetShaderInfoLog(address));
 }
 ```
 
-
-
-
-
-
-
-
-
 This creates a new shader (using a value from the ShaderType enum), loads code for it, compiles it, and adds it to our program. It also prints any errors it found to the console, which is really nice for when you make a mistake in a shader (it will also yell at you if you use deprecated code).
 
-
-
-
 Now that we have this, let's add our shaders. First we'll need two more variables in our class:
-
-
-
 
 ```csharp
         int vsID;
         int fsID;
-
 ```
-
-
-
 
 
 These will store the addresses of our two shaders. Now, we'll want to use the function we made to load our shaders from the files.
 
-
-
 Add this code to initProgram:
-
-
-
-
 
 ```csharp
             loadShader("vs.glsl", ShaderType.VertexShader, pgmID, out vsID);
             loadShader("fs.glsl", ShaderType.FragmentShader, pgmID, out fsID);
 ```
 
-
 Now that the shaders are added, the program needs to be linked. Like C code, the code is first compiled, then linked, so that it goes from human-readable code to the machine language needed.
 
-
 After the other code add:
-
-
-
-
 
 ```csharp
             GL.LinkProgram(pgmID);
             Console.WriteLine(GL.GetProgramInfoLog(pgmID));
 ```
 
-
 This will link it, and tell us if we have any errors.
-
-
 
 The shaders are now added to our program, but we need to give our program more information before it can use them properly. We have multiple inputs on our vertex shader, so we need to get their addresses to give the shader position and color information for our vertices.
 
-
-
 Add this code to the Game class:
-
-
-
-
 
 ```csharp
         int attribute_vcol;
@@ -322,16 +201,9 @@ Add this code to the Game class:
         int uniform_mview;
 ```
 
-
 We're defining three variables here, to store the locations of each variable, for future reference. Later we'll need these values again, so we should keep them handy. (As a side note, I used the name "attribute" because in older versions of GLSL, instead of "in" variables, there were "attributes".) To get the addresses for each variable, we use the GL.GetAttribLocation and GL.GetUniformLocation functions. Each takes the program's ID and the name of the variable in the shader.
 
-
-
 At the end of initProgram, add:
-
-
-
-
 
 ```csharp
             attribute_vpos = GL.GetAttribLocation(pgmID, "vPosition");
@@ -344,20 +216,11 @@ At the end of initProgram, add:
             }
 ```
 
-
 This code will get the values we need, and also do a simple check to make sure the attributes were found.
-
-
 
 Now our shaders and program are set up, but we need to give them something to draw. To do this, we'll be using a Vertex Buffer Object (VBO). When you use a VBO, first you need to have the graphics card create one, then bind to it and send your information. Then, when the DrawArrays function is called, the information in the buffers will be sent to the shaders and drawn to the screen.
 
-
-
 Like with the shaders' variables, we need to store the addresses for future use:
-
-
-
-
 
 ```csharp
         int vbo_position;
@@ -365,12 +228,7 @@ Like with the shaders' variables, we need to store the addresses for future use:
         int vbo_mview;
 ```
 
-
 Creating the buffers is very simple. In initProgram, add:
-
-
-
-
 
 ```csharp
             GL.GenBuffers(1, out vbo_position);
@@ -378,18 +236,11 @@ Creating the buffers is very simple. In initProgram, add:
             GL.GenBuffers(1, out vbo_mview);
 ```
 
-
 This generates 3 separate buffers and stores their addresses in our variables. For multiple buffers like this, there's an option for generating multiple buffers and storing them in an array, but for simplicity's sake, we're keeping them in separate ints.
-
-
 
 These buffers are going to need some data next. The positions and colors will all be Vector3 variables, and the model view will be a Matrix4. We need to store these in an array so the data can be sent to the buffers more efficiently.
 
-
-
 Add three more variables to the Game class:
-
-
 
 ```csharp
         Vector3[] vertdata;
@@ -397,11 +248,7 @@ Add three more variables to the Game class:
         Matrix4[] mviewdata;
 ```
 
-
 For this example, we'll be setting these values in onLoad, along with a call to initProgram():
-
-
-
 
 
 ```csharp
@@ -433,46 +280,25 @@ For this example, we'll be setting these values in onLoad, along with a call to 
         }
 ```
 
-
-
-
 With the data stored, we can now send it to the buffers. We'll need to add another override, this time for the OnUpdateFrame function. The first thing we need to do is bind to the buffer:
-
-
-
-
 
 ```csharp
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_position);
 ```
 
-
-
-
 This tells OpenGL that we'll be using that buffer if we send any data to it. Next, we'll actually send the data:
-
-
-
-
 
 ```csharp
             GL.BufferData&lt;Vector3&gt;(BufferTarget.ArrayBuffer, (IntPtr)(vertdata.Length * Vector3.SizeInBytes), vertdata, BufferUsageHint.StaticDraw);
 ```
 
-
-
-
 This code tells it that we're sending the contents of vertdata, which is (vertdata.Length * Vector3.SizeInBytes) bytes in length, to the buffer. Finally, we'll need to tell it to use this buffer (the last one bound to) for the vPosition variable, which will take 3 floats:
-
-
 
 ```csharp
             GL.VertexAttribPointer(attribute_vpos, 3, VertexAttribPointerType.Float, false, 0, 0);
 ```
-          
 
 So, all together for both variables is:
-
 
 ```csharp
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_position);
@@ -482,8 +308,6 @@ So, all together for both variables is:
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo_color);
             GL.BufferData&lt;Vector3&gt;(BufferTarget.ArrayBuffer, (IntPtr)(coldata.Length * Vector3.SizeInBytes), coldata, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(attribute_vcol, 3, VertexAttribPointerType.Float, true, 0, 0);
-
-
 ```
 We'll also need to send the model view matrix, which uses a different function:
 
@@ -514,13 +338,6 @@ Then we tell it how to draw them:
 
 Then we do a bit to keep things clean:
 
-
-
-
-
-
-
-
 ```csharp
             GL.DisableVertexAttribArray(attribute_vpos);
             GL.DisableVertexAttribArray(attribute_vcol);
@@ -528,18 +345,7 @@ Then we do a bit to keep things clean:
             GL.Flush();
 ```
 
-
-
-
-
-
 So, all together, this function is:
-
-
-
-
-
-
 
 
 ```csharp
@@ -570,9 +376,4 @@ So, all together, this function is:
 Now, if you run this, you'll see that after all this work, we're (more or less) back where we were before.
 
 
-
-<div class="separator" style="clear: both; text-align: center;">
-<a href="http://3.bp.blogspot.com/-FgtyDcp2z8A/UTo04vCbHaI/AAAAAAAAAEg/O0Viac3TCzQ/s1600/2013-03-08_13-58-12.png" imageanchor="1" style="margin-left: 1em; margin-right: 1em;"><img border="0" src="http://3.bp.blogspot.com/-FgtyDcp2z8A/UTo04vCbHaI/AAAAAAAAAEg/O0Viac3TCzQ/s400/2013-03-08_13-58-12.png" height="318" width="400" /></a>
-
-
-
+![]({{ site.url }}/assets/images/tut2/1.png)
